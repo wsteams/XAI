@@ -2,6 +2,6 @@
 
 XAI : Activation Maximization
 
-## Result
+## Results
 
 <img src="actmax.png" align="center">
