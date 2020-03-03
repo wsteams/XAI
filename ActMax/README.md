@@ -4,4 +4,4 @@ XAI : Activation Maximization
 
 ## Result
 
-![actmax](actmax.png "actmax")
+<img src="actmax.png" align="center">
