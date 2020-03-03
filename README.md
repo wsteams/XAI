@@ -16,6 +16,6 @@ AdvImg - Adversarial Images
 
 <img src="DeepDream/sample.png" align="center">
 
-<img src="DeepDream/deepdream.png" align="center">
+<img src="DeepDream/nightmare.png" align="center">
 
 ## SaliencyMap
