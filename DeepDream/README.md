@@ -2,7 +2,7 @@
 
 XAI : DeepDream
 
-## Result
+## Results
 
 ![sample](sample.png "sample")
 
