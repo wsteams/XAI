@@ -10,7 +10,7 @@ ActMax - Activation Maximization
 
 AdvImg - Adversarial Images
 
-<img src="AdvImg/advimg.png" align="center">
+<img src="AdvImg/fast_iterative_least.png" align="center">
 
 ## DeepDream
 
