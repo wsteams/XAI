@@ -2,6 +2,6 @@
 
 XAI : Adversarial Images
 
-## Result
+## Results
 
-![advimg](fast_iterative_least.png "advimg")
+<img src="fast_iterative_least.png" align="center">
