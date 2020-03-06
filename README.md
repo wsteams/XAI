@@ -4,18 +4,18 @@
 
 ActMax - Activation Maximization
 
-<img src="ActMax/actmax.png" align="center">
+<img src="ActMax/actmax.png">
 
 ## AdvImg
 
 AdvImg - Adversarial Images
 
-<img src="AdvImg/fast_iterative_least.png" align="center">
+<img src="AdvImg/fast_iterative_least.png">
 
 ## DeepDream
 
-<img src="DeepDream/sample.png" align="center">
+<img src="DeepDream/sample.png">
 
-<img src="DeepDream/nightmare.png" align="center">
+<img src="DeepDream/nightmare.png">
 
 ## SaliencyMap
