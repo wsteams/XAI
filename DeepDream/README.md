@@ -1,6 +1,6 @@
 # DeepDream
 
-XAI : DeepDream
+DeepDream - Deep Dream Nightmare
 
 ## Results
 
