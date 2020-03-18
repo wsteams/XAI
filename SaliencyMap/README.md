@@ -1,3 +1,3 @@
 # SaliencyMap
 
-XAI : SaliencyMap
+SaliencyMap - Saliency Map
