@@ -2,19 +2,19 @@
 
 ## ActMax
 
-XAI : ActMax - Activation Maximization
+ActMax - Activation Maximization
 
 <img src="ActMax/actmax.png">
 
 ## AdvImg
 
-XAI : AdvImg - Adversarial Images
+AdvImg - Adversarial Images
 
 <img src="AdvImg/fast_iterative_least.png">
 
 ## DeepDream
 
-XAI : DeepDream
+DeepDream - Deep Dream Nightmare
 
 <img src="DeepDream/sample.png">
 
@@ -22,4 +22,4 @@ XAI : DeepDream
 
 ## SaliencyMap
 
-XAI : SaliencyMap
+SaliencyMap - Saliency Map
