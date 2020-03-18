@@ -1,6 +1,6 @@
 # ActMax
 
-XAI : Activation Maximization
+ActMax - Activation Maximization
 
 ## Results
 
