@@ -1,6 +1,6 @@
 # AdvImg
 
-XAI : Adversarial Images
+AdvImg - Adversarial Images
 
 ## Results
 
