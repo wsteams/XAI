@@ -21,3 +21,15 @@ DeepDream - Deep Dream Nightmare
 ## SaliencyMap
 
 SaliencyMap - Saliency Map
+
+## Vanilla Gradients
+
+<img src="SaliencyMap/part1_vanilla.png">
+
+## Integrated Gradients
+
+<img src="SaliencyMap/part1_integrated.png">
+
+## Occlusion
+
+<img src="SaliencyMap/part1_occlusion.png">
