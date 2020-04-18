@@ -2,14 +2,14 @@
 
 SaliencyMap - Saliency Map
 
-##Vanilla Gradients
+## Vanilla Gradients
 
 <img src="part1_vanilla.png">
 
-##Integrated Gradients
+## Integrated Gradients
 
 <img src="part1_integrated.png">
 
-##Occlusion
+## Occlusion
 
 <img src="part1_occlusion.png">
