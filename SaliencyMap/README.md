@@ -14,10 +14,6 @@ SaliencyMap - Saliency Map
 
 <img src="part1_occlusion.png">
 
-## Deconvolution
-
-<img src="part2_deconvolution.png">
-
 ## Guided Backpropagation
 
 <img src="part2_gbp.png">
