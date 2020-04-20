@@ -9,15 +9,6 @@ img_height = 224
 img_width = 224
 
 
-def LocalResponseNormalization(k, n, alpha, beta):
-    x = C.placeholder()
-    xs = C.reshape(C.square(x), (1, C.InferredDimension), 0, 1)
-    W = C.constant(alpha / (2 * n + 1), (1, 2 * n + 1, 1, 1))
-    y = C.convolution (W, xs)
-    b = C.reshape(y, C.InferredDimension, 0, 2)
-    return C.element_divide(x, C.exp(beta * C.log(k + b)))
-
-
 def conv(weights, bias, name=''):
     W = C.Constant(value=weights, name='W')
     b = C.Constant(value=bias, name='b')
@@ -42,6 +33,15 @@ def max_pool(input, ksize=3, stirde=2):
     return C.pooling(input, C.MAX_POOLING, pooling_window_shape=[ksize, ksize], strides=[stride, stride], auto_padding=[False, True, True])
     
     
+def LocalResponseNormalization(k, n, alpha, beta):
+    x = C.placeholder()
+    xs = C.reshape(C.square(x), (1, C.InferredDimension), 0, 1)
+    W = C.constant(alpha / (2 * n + 1), (1, 2 * n + 1, 1, 1))
+    y = C.convolution (W, xs)
+    b = C.reshape(y, C.InferredDimension, 0, 2)
+    return C.element_divide(x, C.exp(beta * C.log(k + b)))
+
+
 def inception_module(h, W1x1, b1x1, W3x3, b3x3, W3x3r, b3x3r, W5x5, b5x5, W5x5r, b5x5r, Wmax, bmax, name=''):
     """ Inception module GoogLeNet
 
@@ -82,12 +82,12 @@ def create_googlenet(h):
     #
     # GoogLeNet
     #
-    conv1 = C.relu(conv(params[24].value, params[25].value, stride=2, name="conv0")(h))
+    conv1 = C.relu(conv(params[24].value, params[25].value, stride=2, name="conv1")(h))
     pool1 = max_pool(conv1)
     norm1 = LocalResponseNormalization(1.0, 2, 1e-4, 0.75)(pool1)
 
-    conv2 = C.relu(conv(params[22].value, params[23].value, pad=False, name="conv1")(norm1))
-    conv2 = C.relu(conv(params[20].value, params[21].value, name="conv2")(conv2))
+    conv2 = C.relu(conv(params[22].value, params[23].value, pad=False, name="conv2_1")(norm1))
+    conv2 = C.relu(conv(params[20].value, params[21].value, name="conv2_2")(conv2))
     norm2 = LocalResponseNormalization(1.0, 2, 1e-4, 0.75)(conv2)
 
     pool2 = max_pool(norm2)
