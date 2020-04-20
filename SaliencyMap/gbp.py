@@ -44,7 +44,6 @@ def conv(weights, bias, name=''):
     @BlockFunction('conv', name)
     def Conv(x):
         return C.convolution(W, x, strides=[1, 1], auto_padding=[False, True, True]) + b
-
     return Conv
 
 
@@ -55,7 +54,6 @@ def dense(weights, bias, name=''):
     @BlockFunction('dense', name)
     def FC(x):
         return C.times(C.reshape(x, -1), W) + b
-
     return FC
 
 
