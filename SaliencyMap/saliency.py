@@ -135,4 +135,4 @@ def grayscale_map(img3d, percentile=99):
     vmin = np.min(img2d)
 
     return np.clip((img2d - vmin) / (vmax - vmin), 0, 1)
-
+    
