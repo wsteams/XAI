@@ -1,12 +1,11 @@
 import cntk as C
 import cv2
-import matplotlib.pyplot as plt
 import numpy as np
 
 from cntk.ops.functions import UserFunction
 from cntk import user_function, output_variable
 
-from saliency import *
+from saliency import divergence_map
 
 C.debugging.force_deterministic(0)
 
@@ -83,12 +82,6 @@ def create_vgg19(h):
 
 if __name__ == "__main__":
     #
-    # ImageNet categories
-    #
-    with open("../ImageNet.txt") as f:
-        category = f.readlines()
-
-    #
     # input and model
     #
     input = C.input_variable(shape=(img_channel, img_height, img_width), dtype="float32", needs_gradient=True)
@@ -98,26 +91,8 @@ if __name__ == "__main__":
     x_img = np.ascontiguousarray(img.transpose(2, 0, 1), dtype="float32")
 
     #
-    # classification
-    #
-    pred = vgg19.eval({input: x_img - img_mean}).argmax()
-    print(category[pred])
-
-    #
     # Guided Backpropagation
     #
     guided_backprop = C.combine([vgg19.relu16]).grad({input: x_img - img_mean})[0]
     guided_backprop = divergence_map(guided_backprop)
-
-    plt.figure()
-    plt..subplot(1, 2, 1)
-    plt.axis("off")
-    plt.imshow(img[..., ::-1])
-    plt.title(category[pred][:-1])
-    plt.subplot(1, 2, 2)
-    plt.axis("off")
-    plt.imshow(guided_backprop, cmap="bwr")
-    plt.colorbar()
-    plt.title("Guided Backpropagation")
-    plt.show()
     
