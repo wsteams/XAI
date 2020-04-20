@@ -75,13 +75,13 @@ def inception_module(h, W1x1, b1x1, W3x3, b3x3, W3x3r, b3x3r, W5x5, b5x5, W5x5r,
 
 
 def create_googlenet(h):
+    """
+    https://www.cntk.ai/Models/Caffe_Converted/BNInception_ImageNet_Caffe.model
+    """
     model = C.load_model("../DeepDream/BNInception_ImageNet_Caffe.model")
 
     params = model.parameters
 
-    #
-    # GoogLeNet
-    #
     conv1 = C.relu(conv(params[24].value, params[25].value, stride=2, name="conv1")(h))
     pool1 = max_pool(conv1)
     norm1 = LocalResponseNormalization(1.0, 2, 1e-4, 0.75)(pool1)
