@@ -58,7 +58,11 @@ def dense(weights, bias, name=''):
 
     return FC
 
-  
+
+def max_pool(input, ksize=3, stirde=2):
+    return C.pooling(input, C.MAX_POOLING, pooling_window_shape=[ksize, ksize], strides=[stride, stride], auto_padding=[False, True, True])
+
+
 def create_vgg19(h):
     """
     https://www.cntk.ai/Models/Caffe_Converted/VGG19_ImageNet_Caffe.model
@@ -70,7 +74,7 @@ def create_vgg19(h):
         h = conv(params[-(2 * i + 2)].value, params[-(2 * i + 1)].value, name="conv{}".format(i + 1))(h)
         h = user_function(GuidedReLU(h, name="relu{}".format(i + 1)))
         if i in [1, 3, 7, 11, 15]:
-            h = h = C.pooling(h, C.MAX_POOLING, pooling_window_shape=(2, 2), strides=(2, 2), auto_padding=[False, True, True])
+            h = max_pool(h, ksize=2, stride=2)
 
     h = C.reshape(h, -1)
     h = user_function(GuidedReLU(dense(params[4].value.reshape(-1, 4096), params[5].value)(h)))
