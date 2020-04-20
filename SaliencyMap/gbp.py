@@ -49,7 +49,7 @@ def conv(weights, bias, name=''):
     return Conv
 
 
-def dense(weights, bias=None, is_train=False, name=''):
+def dense(weights, bias, name=''):
     W = C.Constant(value=weights, name='W')
     b = C.Constant(value=bias, name='b')
 
