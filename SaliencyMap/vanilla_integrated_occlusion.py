@@ -3,6 +3,7 @@ import cv2
 import numpy as np
 
 from saliency import VanillaGradients, IntegratedGradients, Occlusion
+from saliency import grayscale_map
 
 C.debugging.force_deterministic(0)
 
