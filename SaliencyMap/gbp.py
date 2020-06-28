@@ -2,8 +2,8 @@ import cntk as C
 import cv2
 import numpy as np
 
-from cntk.ops.functions import UserFunction
 from cntk import user_function, output_variable
+from cntk.ops.functions import UserFunction
 
 from saliency import divergence_map
 
