@@ -30,6 +30,7 @@ def vgg19(h):
 
 if __name__ == "__main__":
     input = C.input_variable(shape=(img_channel, img_height, img_width), dtype="float32", needs_gradient=True)
+    
     model = vgg19(input - img_mean)
 
     img = np.ascontiguousarray((np.random.rand(img_channel, img_height, img_width) + img_mean, dtype="float32")
