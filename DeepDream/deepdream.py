@@ -77,7 +77,7 @@ def inception_module(h, W1x1, b1x1, W3x3, b3x3, W3x3r, b3x3r, W5x5, b5x5, W5x5r,
     return C.splice(conv1x1, conv3x3, conv5x5, pool3x3, axis=0, name=name)
 
 
-def googlenet(h):
+def create_googlenet(h):
     """
     https://www.cntk.ai/Models/Caffe_Converted/BNInception_ImageNet_Caffe.model
     """
@@ -170,7 +170,7 @@ if __name__ == "__main__":
 
         img_h, img_w = img.shape[:2]
         input_sub = C.input_variable(shape=(3, img_h, img_w), needs_gradient=True)
-        model = googlenet(input_sub)
+        model = create_googlenet(input_sub)
 
         model_sub = C.combine([model.icp5b_3x3])
 
