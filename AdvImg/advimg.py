@@ -74,6 +74,7 @@ def alexnet(h):
 
 if __name__ == "__main__":
     input = C.input_variable(shape=(img_channel, img_height, img_width), dtype="float32", needs_gradient=True)
+    
     model = alexnet(input)
 
     adversarial_image = AdversarialImage(model)
