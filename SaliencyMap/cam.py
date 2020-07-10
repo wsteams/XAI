@@ -138,7 +138,7 @@ if __name__ == "__main__":
     # input and model
     #
     input = C.input_variable(shape=(img_channel, img_height, img_width), dtype="float32", needs_gradient=True)
-    googlenet = create_googlenet(input)
+    model = create_googlenet(input)
 
     img = cv2.resize(cv2.imread("./cat.jpg"), (img_width, img_height))
     x_img = np.ascontiguousarray(img.transpose(2, 0, 1), dtype="float32")
@@ -146,9 +146,9 @@ if __name__ == "__main__":
     #
     # class activation map
     #
-    feature_map = C.combine([googlenet.icp5b]).eval({input: x_img})[0]
+    feature_map = C.combine([model.icp5b]).eval({input: x_img})[0]
     cam = np.zeros((feature_map.shape[1], feature_map.shape[2]))
-    W = googlenet.fc.W.value
+    W = model.fc.W.value
     for i in range(feature_map.shape[0]):
         cam += W[i, pred] * feature_map[i]
 
