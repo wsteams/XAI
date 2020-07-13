@@ -69,6 +69,9 @@ def local_response_normalization(k, n, alpha, beta):
 
 
 def alexnet(h):
+    """
+    https://www.cntk.ai/Models/CNTK_Pretrained/AlexNet_ImageNet_CNTK.model
+    """
     model = C.load_model("./AlexNet_ImageNet_CNTK.model")
 
     params = model.parameters
