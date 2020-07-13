@@ -90,7 +90,7 @@ if __name__ == "__main__":
     x_img = np.ascontiguousarray(img.transpose(2, 0, 1), dtype="float32")
 
     #
-    # Guided Backpropagation
+    # guided backpropagation
     #
     guided_backprop = C.combine([vgg19.relu16]).grad({input: x_img - img_mean})[0]
     guided_backprop = divergence_map(guided_backprop)
