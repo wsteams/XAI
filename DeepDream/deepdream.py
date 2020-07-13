@@ -12,31 +12,29 @@ epsilon = 1e-7
 is_write = False
 
 
-def conv(weights, bias, name=''):
+def convolution(weights, bias, pad=True, stride=1, name=''):
     W = C.Constant(value=weights, name='W')
     b = C.Constant(value=bias, name='b')
 
-    @BlockFunction('conv', name)
-    def Conv(x):
-        return C.convolution(W, x, strides=[1, 1], auto_padding=[False, True, True]) + b
-    return Conv
+    @C.BlockFunction('Convolution2D', name)
+    def conv2d(x):
+        return C.convolution(W, x, strides=[stride, stride], auto_padding=[False, pad, pad]) + b
+
+    return conv2d
 
 
 def dense(weights, bias, name=''):
     W = C.Constant(value=weights, name='W')
     b = C.Constant(value=bias, name='b')
 
-    @BlockFunction('dense', name)
-    def FC(x):
-        return C.times(C.reshape(x, -1), W) + b
-    return FC
+    @C.BlockFunction('Dense', name)
+    def fc(x):
+        return C.times(x, W) + b
+
+    return fc
 
 
-def max_pool(input, ksize=3, stirde=2):
-    return C.pooling(input, C.MAX_POOLING, pooling_window_shape=[ksize, ksize], strides=[stride, stride], auto_padding=[False, True, True])
-
-
-def LocalResponseNormalization(k, n, alpha, beta):
+def local_response_normalization(k, n, alpha, beta):
     x = C.placeholder()
     xs = C.reshape(C.square(x), (1, C.InferredDimension), 0, 1)
     W = C.constant(alpha / (2 * n + 1), (1, 2 * n + 1, 1, 1))
@@ -63,16 +61,18 @@ def inception_module(h, W1x1, b1x1, W3x3, b3x3, W3x3r, b3x3r, W5x5, b5x5, W5x5r,
                    concat
     """
     # 1x1 convolution
-    conv1x1 = C.relu(conv(W1x1, b1x1, name=name + "_1x1")(h))
+    conv1x1 = C.relu(convolution(W1x1, b1x1, name=name + "_1x1")(h))
 
     # 1x1 reduction -> 3x3 convolution
-    conv3x3 = C.relu(conv(W3x3, b3x3, name=name + "_3x3")(C.relu(conv(W3x3r, b3x3r, name=name + "_3x3_bottleneck")(h))))
+    conv3x3 = C.relu(convolution(W3x3r, b3x3r, name=name + "_3x3_bottleneck")(h))
+    conv3x3 = C.relu(convolution(W3x3, b3x3, name=name + "_3x3")(conv3x3))
 
     # 1x1 reduction -> 5x5 convolution
-    conv5x5 = C.relu(conv(W5x5, b5x5, name=name + "_5x5")(C.relu(conv(W5x5r, b5x5r, name=name + "_5x5_bottleneck")(h))))
+    conv5x5 = C.relu(convolution(W5x5r, b5x5r, name=name + "_5x5_bottleneck")(h))
+    conv5x5 = C.relu(convolution(W5x5, b5x5, name=name + "_5x5")(conv5x5))
 
     # 3x3 max pool -> 1x1 reduction
-    pool3x3 = C.relu(conv(Wmax, bmax, name=name + "_pool")(max_pool(h, stride=1)))
+    pool3x3 = C.relu(convolution(Wmax, bmax, name=name + "_pool")(C.layers.MaxPooling((3, 3), strides=1, pad=True)(h)))
 
     return C.splice(conv1x1, conv3x3, conv5x5, pool3x3, axis=0, name=name)
 
@@ -85,15 +85,15 @@ def create_googlenet(h):
 
     params = model.parameters
 
-    conv1 = C.relu(conv(params[24].value, params[25].value, stride=2, name="conv1")(h))
-    pool1 = max_pool(conv1)
-    norm1 = LocalResponseNormalization(1.0, 2, 1e-4, 0.75)(pool1)
+    conv1 = C.relu(convolution(params[24].value, params[25].value, stride=2, name="conv1")(h))
+    pool1 = C.layers.MaxPooling((3, 3), strides=2, pad=True)(conv1)
+    norm1 = local_response_normalization(1.0, 2, 1e-4, 0.75)(pool1)
 
-    conv2 = C.relu(conv(params[22].value, params[23].value, pad=False, name="conv2_1")(norm1))
-    conv2 = C.relu(conv(params[20].value, params[21].value, name="conv2_2")(conv2))
-    norm2 = LocalResponseNormalization(1.0, 2, 1e-4, 0.75)(conv2)
+    conv2 = C.relu(convolution(params[22].value, params[23].value, pad=False, name="conv2_1")(norm1))
+    conv2 = C.relu(convolution(params[20].value, params[21].value, name="conv2_2")(conv2))
+    norm2 = local_response_normalization(1.0, 2, 1e-4, 0.75)(conv2)
 
-    pool2 = max_pool(norm2)
+    pool2 = C.layers.MaxPooling((3, 3), strides=2, pad=True)(norm2)
 
     icp3a = inception_module(pool2, params[18].value, params[19].value, params[26].value, params[27].value,
                              params[28].value, params[29].value, params[30].value, params[31].value,
@@ -102,7 +102,7 @@ def create_googlenet(h):
                              params[38].value, params[39].value, params[40].value, params[41].value,
                              params[42].value, params[43].value, params[44].value, params[45].value, name="icp3b")
 
-    pool3 = max_pool(icp3b)
+    pool3 = C.layers.MaxPooling((3, 3), strides=2, pad=True)(icp3b)
 
     icp4a = inception_module(pool3, params[14].value, params[15].value, params[46].value, params[47].value,
                              params[48].value, params[49].value, params[50].value, params[51].value,
@@ -124,7 +124,7 @@ def create_googlenet(h):
                              params[88].value, params[89].value, params[90].value, params[91].value,
                              params[92].value, params[93].value, params[94].value, params[95].value, name="icp4e")
 
-    pool4 = max_pool(icp4e)
+    pool4 = C.layers.MaxPooling((3, 3), strides=2, pad=True)(icp4e)
 
     icp5a = inception_module(pool4, params[4].value, params[5].value, params[96].value, params[97].value,
                              params[98].value, params[99].value, params[100].value, params[101].value,
@@ -136,7 +136,7 @@ def create_googlenet(h):
 
     pool5 = C.layers.GlobalAveragePooling()(icp5b)
 
-    fc = dense(params[0].value.reshape(-1, 1000), params[1].value, name="fc")(pool5)
+    fc = dense(params[0].value, params[1].value, name="fc")(pool5)
 
     return fc
 
