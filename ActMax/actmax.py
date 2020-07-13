@@ -36,6 +36,9 @@ def dense(weights, bias, name=''):
 
 
 def vgg19(h):
+    """
+    https://www.cntk.ai/Models/Caffe_Converted/VGG19_ImageNet_Caffe.model
+    """
     model = C.load_model("./VGG19_ImageNet_Caffe.model")
 
     params = model.parameters
