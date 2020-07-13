@@ -37,11 +37,33 @@ class AdversarialImage:
         return np.clip(adversarial / 255, 0, 1) * 255
 
 
-def LocalResponseNormalization(k, n, alpha, beta):
+def convolution(weights, bias, pad=True, stride=1, name=''):
+    W = C.Constant(value=weights, name='W')
+    b = C.Constant(value=bias, name='b')
+
+    @C.BlockFunction('Convolution2D', name)
+    def conv2d(x):
+        return C.convolution(W, x, strides=[stride, stride], auto_padding=[False, pad, pad]) + b
+
+    return conv2d
+
+
+def dense(weights, bias, name=''):
+    W = C.Constant(value=weights, name='W')
+    b = C.Constant(value=bias, name='b')
+
+    @C.BlockFunction('Dense', name)
+    def fc(x):
+        return C.times(x, W) + b
+
+    return fc
+
+
+def local_response_normalization(k, n, alpha, beta):
     x = C.placeholder()
     xs = C.reshape(C.square(x), (1, C.InferredDimension), 0, 1)
     W = C.constant(alpha / (2 * n + 1), (1, 2 * n + 1, 1, 1))
-    y = C.convolution (W, xs)
+    y = C.convolution(W, xs)
     b = C.reshape(y, C.InferredDimension, 0, 2)
     return C.element_divide(x, C.exp(beta * C.log(k + b)))
 
@@ -51,28 +73,31 @@ def alexnet(h):
 
     params = model.parameters
 
-    conv1 = C.relu(C.convolution(params[7].value, h, strides=4, auto_padding=[False, True, True]) + params[8].value)
-    norm1 = LocalResponseNormalization(1.0, 2, 1e-4, 0.75)(conv1)
-    pool1 = C.pooling(norm1, C.MAX_POOLING, pooling_window_shape=(3, 3), strides=(2, 2), auto_padding=[False, False, False])
+    conv1 = C.relu(convolution(params[7].value, params[8].value, stride=4, pad=False)(h))
+    norm1 = local_response_normalization(1.0, 2, 1e-4, 0.75)(conv1)
+    pool1 = C.layers.MaxPooling((3, 3), strides=2, pad=False)(norm1)
 
-    conv2 = C.relu(C.convolution(params[6].value, pool1, strides=1, auto_padding=[False, True, True]) + params[9].value)
-    norm2 = LocalResponseNormalization(1.0, 2, 1e-4, 0.75)(conv2)
-    pool2 = C.pooling(norm2, C.MAX_POOLING, pooling_window_shape=(3, 3), strides=(2, 2), auto_padding=[False, False, False])
+    conv2 = C.relu(convolution(params[6].value, params[9].value)(pool1))
+    norm2 = local_response_normalization(1.0, 2, 1e-4, 0.75)(conv2)
+    pool2 = C.layers.MaxPooling((3, 3), strides=2, pad=False)(norm2)
 
-    conv3 = C.relu(C.convolution(params[5].value, pool2, strides=1, auto_padding=[False, True, True]) + params[10].value)
-    conv4 = C.relu(C.convolution(params[4].value, conv3, strides=1, auto_padding=[False, True, True]) + params[11].value)
-    conv5 = C.relu(C.convolution(params[3].value, conv4, strides=1, auto_padding=[False, True, True]) + params[12].value)
+    conv3 = C.relu(convolution(params[5].value, params[10].value)(pool2))
+    conv4 = C.relu(convolution(params[4].value, params[11].value)(conv3))
+    conv5 = C.relu(convolution(params[3].value, params[12].value)(conv4))
 
-    pool3 = C.pooling(conv5, C.MAX_POOLING, pooling_window_shape=(3, 3), strides=(2, 2), auto_padding=[False, False, False])
+    pool3 = C.layers.MaxPooling((3, 3), strides=2, pad=False)(conv5)
 
-    h = C.relu(C.times(pool3, params[2].value.reshape(-1, 4096)) + params[13].value)
-    h = C.relu(C.times(h, params[1].value) + params[14].value)
-    h = C.times(h, params[0].value) + params[15].value
+    h = C.relu(dense(params[2].value, params[13].value)(pool3))
+    h = C.relu(dense(params[1].value, params[14].value)(h))
+    h = dense(params[0].value, params[15].value)(h)
 
     return h
 
 
 if __name__ == "__main__":
+    #
+    # input and model
+    #
     input = C.input_variable(shape=(img_channel, img_height, img_width), dtype="float32", needs_gradient=True)
     
     model = alexnet(input)
@@ -80,7 +105,6 @@ if __name__ == "__main__":
     adversarial_image = AdversarialImage(model)
 
     img = cv2.resize(cv2.imread("./panda.jpg"), (img_width, img_height))
-
     x_img = np.ascontiguousarray(img.transpose(2, 0, 1), dtype="float32")
 
     #
