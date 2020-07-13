@@ -37,28 +37,26 @@ class GuidedReLU(UserFunction):
         return GuidedReLU(inputs[0], name)
 
       
-def conv(weights, bias, name=''):
+def convolution(weights, bias, pad=True, stride=1, name=''):
     W = C.Constant(value=weights, name='W')
     b = C.Constant(value=bias, name='b')
 
-    @BlockFunction('conv', name)
-    def Conv(x):
-        return C.convolution(W, x, strides=[1, 1], auto_padding=[False, True, True]) + b
-    return Conv
+    @C.BlockFunction('Convolution2D', name)
+    def conv2d(x):
+        return C.convolution(W, x, strides=[stride, stride], auto_padding=[False, pad, pad]) + b
+
+    return conv2d
 
 
 def dense(weights, bias, name=''):
     W = C.Constant(value=weights, name='W')
     b = C.Constant(value=bias, name='b')
 
-    @BlockFunction('dense', name)
-    def FC(x):
-        return C.times(C.reshape(x, -1), W) + b
-    return FC
+    @C.BlockFunction('Dense', name)
+    def fc(x):
+        return C.times(x, W) + b
 
-
-def max_pool(input, ksize=3, stirde=2):
-    return C.pooling(input, C.MAX_POOLING, pooling_window_shape=[ksize, ksize], strides=[stride, stride], auto_padding=[False, True, True])
+    return fc
 
 
 def create_vgg19(h):
@@ -69,13 +67,12 @@ def create_vgg19(h):
 
     params = model.parameters
     for i in range(16):
-        h = conv(params[-(2 * i + 2)].value, params[-(2 * i + 1)].value, name="conv{}".format(i + 1))(h)
+        h = convolution(params[-(2 * i + 2)].value, params[-(2 * i + 1)].value, name="conv{}".format(i + 1))(h)
         h = user_function(GuidedReLU(h, name="relu{}".format(i + 1)))
         if i in [1, 3, 7, 11, 15]:
-            h = max_pool(h, ksize=2, stride=2)
+            h = C.layers.MaxPooling((2, 2), strides=2, pad=True)(h)
 
-    h = C.reshape(h, -1)
-    h = user_function(GuidedReLU(dense(params[4].value.reshape(-1, 4096), params[5].value)(h)))
+    h = user_function(GuidedReLU(dense(params[4].value, params[5].value)(h)))
     h = user_function(GuidedReLU(dense(params[2].value, params[3].value)(h)))
     h = dense(params[0].value, params[1].value)(h)
 
