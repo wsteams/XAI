@@ -1,4 +1,5 @@
 import cntk as C
+import matplotlib.pyplot as plt
 import numpy as np
 
 C.debugging.force_deterministic(0)
@@ -82,4 +83,13 @@ if __name__ == "__main__":
         grads = activation.grad({input: img})[0]
         grads /= (np.sqrt(np.mean(np.square(grads))) + epsilon)
         img += grads
+    
+    #
+    # visualization
+    #
+    plt.figure()
+    plt.imshow(np.transpose(np.clip(img / 255, 0, 1) * 255, (1, 2, 0))[..., ::-1].astype("uint8"))
+    plt.axis("off")
+    plt.title("{:s} {:.2f}%".format(category[prob.argmax()][:-1], prob.max() * 100))
+    plt.show()
     
