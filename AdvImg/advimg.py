@@ -1,5 +1,6 @@
 import cntk as C
 import cv2
+import matplotlib.pyplot as plt
 import numpy as np
 
 img_channel = 3
@@ -116,4 +117,18 @@ if __name__ == "__main__":
     x_fast = adversarial_image.fast_method(x_img)
     x_iterative = adversarial_image.iterative_fast(x_img)
     x_least = adversarial_image.least_likely(x_img)
+    
+    #
+    # visualization
+    #
+    plt.figure(figsize=(16, 16))
+    for i, x in enumerate(img_list):
+        output = C.softmax(model).eval({model.arguments[0]: x - img_mean})
+        
+        plt.subplot(2, 2, i + 1)
+        plt.imshow(x.transpose(1, 2, 0)[..., ::-1].astype("uint8"))
+        plt.title("%s %.2f%%" % (category[output.argmax()][:-1], output.max() * 100))
+        plt.axis("off")
+    plt.tight_layout()
+    plt.show()
     
