@@ -118,6 +118,8 @@ if __name__ == "__main__":
     x_iterative = adversarial_image.iterative_fast(x_img)
     x_least = adversarial_image.least_likely(x_img)
     
+    img_list = [x_img, x_fast, x_iterative, x_least]
+    
     #
     # visualization
     #
