@@ -87,7 +87,7 @@ if __name__ == "__main__":
     #
     # visualization
     #
-    plt.figure()
+    plt.figure(figsize=(8, 6))
     plt.imshow(np.transpose(np.clip(img / 255, 0, 1) * 255, (1, 2, 0))[..., ::-1].astype("uint8"))
     plt.axis("off")
     plt.title("{:s} {:.2f}%".format(category[prob.argmax()][:-1], prob.max() * 100))
