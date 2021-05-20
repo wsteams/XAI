@@ -196,7 +196,7 @@ if __name__ == "__main__":
     nightmare = np.uint8(np.clip(img / 255.0, 0, 1) * 255)
 
     plt.figure()
-    plt.imshow(nightmare)
+    plt.imshow(nightmare[..., ::-1])
     plt.axis("off")
     plt.show()
     
