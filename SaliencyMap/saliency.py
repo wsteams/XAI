@@ -3,7 +3,9 @@ import numpy as np
 
 
 class SaliencyMap:
-    """ https://github.com/PAIR-code/saliency/tree/master/saliency """
+    """
+    https://github.com/PAIR-code/saliency/tree/master/saliency
+    """
     def __init__(self, model):
         self.model = model
 
@@ -53,13 +55,16 @@ class IntegratedGradients(VanillaGradients):
     """
     https://arxiv.org/abs/1703.01365
     """
+    def __init__(self, model):
+        super(IntegratedGradients, self).__init__(model)
+        
     def saliency_map(self, img, base=None, steps=25):
         """ Integrated Gradients
 
         Parameters
         ----------
-        base  : baseline value used in integration (default=None)
-        steps : number of integrated steps between baseline and x (default=25)
+        base : baseline value used in integration (default=None)
+        steps: number of integrated steps between baseline and x (default=25)
 
         """
         if base is None:
@@ -90,8 +95,8 @@ class Occlusion(SaliencyMap):
 
         Parameters
         ----------
-        window_size : occlusion window size (default=4)
-        fill_value  : value filled occlusion window (default=0)
+        window_size: occlusion window size (default=4)
+        fill_value : value filled occlusion window (default=0)
 
         """
         occlusion_window = np.empty((img.shape[0], window_size, window_size))
@@ -117,7 +122,7 @@ class Occlusion(SaliencyMap):
 
 
 def divergence_map(img3d, percentile=99):
-    """ Return a gray-scale with positive and negative values """
+    """ return a gray-scale with positive and negative values """
     img2d = np.sum(img3d, axis=0)
 
     span = abs(np.percentile(img2d, percentile))
@@ -128,7 +133,7 @@ def divergence_map(img3d, percentile=99):
 
 
 def grayscale_map(img3d, percentile=99):
-    """ Return a gray-scale image """
+    """ return a gray-scale image """
     img2d = np.sum(np.abs(img3d), axis=0)
 
     vmax = np.percentile(img2d, percentile)
