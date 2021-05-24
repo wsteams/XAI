@@ -45,3 +45,13 @@ SaliencyMap - Saliency Map
 ### Grad-CAM
 
 <img src="SaliencyMap/part2_gradcam.png">
+
+### BlurIG
+
+<img src="SaliencyMap/part3_blurig.png">
+
+### XRAI
+
+<img src="SaliencyMap/part3_xrai.png">
+
+
