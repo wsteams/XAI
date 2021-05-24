@@ -23,7 +23,7 @@ if __name__ == "__main__":
     vgg19 = C.combine([model.fc8]).clone(method="share", substitutions={model.arguments[0]: input})
 
     img = cv2.resize(cv2.imread("./cat.jpg"), (img_width, img_height))
-    x_img = np.ascontiguousarray(img.transpose(2, 0, 1), dtype="float32")
+    x_img = np.ascontiguousarray(img.transpose(2, 0, 1), dtype="float32") - img_mean
 
     #
     # vanilla gradients
