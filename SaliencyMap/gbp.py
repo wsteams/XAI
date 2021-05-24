@@ -87,11 +87,11 @@ if __name__ == "__main__":
     vgg19 = create_vgg19(input)
 
     img = cv2.resize(cv2.imread("./cat.jpg"), (img_width, img_height))
-    x_img = np.ascontiguousarray(img.transpose(2, 0, 1), dtype="float32")
+    x_img = np.ascontiguousarray(img.transpose(2, 0, 1), dtype="float32") - img_mean
 
     #
     # guided backpropagation
     #
-    guided_backprop = C.combine([vgg19.relu16]).grad({input: x_img - img_mean})[0]
+    guided_backprop = C.combine([vgg19.relu16]).grad({input: x_img})[0]
     guided_backprop = divergence_map(guided_backprop)
     
